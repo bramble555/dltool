@@ -1,8 +1,12 @@
 # 命令行工具 dltool
-### 环境：
-windows
+## Requirements
+- go version 1.22.2
+- windows 11
+## Install
+[go version 1.22.2](https://golang.google.cn/dl/go1.22.2.windows-amd64.msi)
+## Usage
+This a example.
+```go  
+dltool -url=https://stream7.iqilu.com/10339/upload_transcode/202002/09/20200209104902N3v5Vpxuvb.mp -dir=./file/
+```
 
-使用样例：dltool -url=[...] -dir=[...]
-
-### 注意：
-如果dir没有输入，则下载到本地./file这个目录下
