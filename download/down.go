@@ -3,7 +3,6 @@ package download
 import (
 	"dltool/parameter"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -21,7 +20,7 @@ func Do() {
 			err = os.MkdirAll(dir, 0755)
 			if err != nil {
 				fmt.Println("创建目录失败")
-				os.Exit(0)
+				return
 			}
 		}
 	}
@@ -31,8 +30,19 @@ func Do() {
 	}
 	// 最后关闭响应体
 	defer resp.Body.Close()
+	// 获取扩展名
+	contentType := resp.Header.Get("Content-Type")
+	if contentType == "" {
+		fmt.Println("下载失败 Content-Type header 丢失")
+		return
+	}
+	extension := getExtension(contentType)
+	if extension == "" {
+		fmt.Println("下载失败 extension 丢失")
+		return
+	}
 	// 获取下载到本地文件的名字
-	fileName := filepath.Base(url) + ".png"
+	fileName := filepath.Base(url) + "." + extension
 	file := dir + fileName
 	// 创建文件，并且这个文件可读可写
 	filePath, err := os.OpenFile(file, os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0755)
@@ -40,10 +50,6 @@ func Do() {
 		panic(err)
 	}
 	// 复制文件
-	_, err = io.Copy(filePath, resp.Body)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("下载完成")
+	progress(filePath, resp)
 
 }
